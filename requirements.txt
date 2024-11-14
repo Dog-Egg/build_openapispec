@@ -1,5 +1,4 @@
 # test
 pytest
 pytest-markdown-docs
-coverage
-tox
+pytest-cov
