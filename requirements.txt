@@ -1,5 +1,5 @@
 # test
 pytest
 pytest-markdown-docs
-pytest-cov
 openapi-spec-validator
+coverage
