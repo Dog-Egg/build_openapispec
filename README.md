@@ -1,5 +1,7 @@
 # build-openapispec
 
+[![codecov](https://codecov.io/github/Dog-Egg/build_openapispec/graph/badge.svg?token=E7ZD7WEBO2)](https://codecov.io/github/Dog-Egg/build_openapispec)
+
 为构建 OAS 提供一些便利，如自动将多次引用的 Schema Object 转为 Reference Object。
 
 ```python
