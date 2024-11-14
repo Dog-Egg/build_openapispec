@@ -1,6 +1,3 @@
-import json
-import re
-
 import pytest
 
 from build_openapispec import openapispec
@@ -8,7 +5,24 @@ from build_openapispec import openapispec
 
 @pytest.fixture
 def oas():
-    return openapispec("3.0.3")
+
+    oas = openapispec("3.0.3")
+    old_build = oas.build
+
+    def new_build(*args, **kwargs):
+        import json
+
+        from openapi_spec_validator import validate
+
+        result = old_build(*args, **kwargs)
+
+        validate(result)  # check valid schema
+        json.dumps(result)  # check json serializable
+
+        return result
+
+    oas.build = new_build
+    return oas
 
 
 def test_basic_build(oas):
@@ -164,9 +178,6 @@ def test_basic_build(oas):
         },
     }
 
-    # test serialization
-    json.dumps(result)
-
 
 def test_refs_1(oas):
     """
@@ -197,14 +208,14 @@ def test_refs_1(oas):
                                     "parameters": [
                                         oas.ParameterObject(
                                             {
-                                                "name": "bar",
+                                                "name": "a",
                                                 "in": "query",
                                                 "schema": foo,
                                             }
                                         ),
                                         oas.ParameterObject(
                                             {
-                                                "name": "bar",
+                                                "name": "b",
                                                 "in": "query",
                                                 "schema": bar,
                                             }
@@ -247,14 +258,14 @@ def test_refs_1(oas):
                     "parameters": [
                         {
                             "in": "query",
-                            "name": "bar",
+                            "name": "a",
                             "schema": {
                                 "$ref": "#/components/schemas/foo",
                             },
                         },
                         {
                             "in": "query",
-                            "name": "bar",
+                            "name": "b",
                             "schema": {
                                 "$ref": "#/components/schemas/bar",
                             },
@@ -290,7 +301,7 @@ def test_refs_1(oas):
                                     "parameters": [
                                         oas.ParameterObject(
                                             {
-                                                "name": "bar",
+                                                "name": "a",
                                                 "in": "query",
                                                 "schema": bar,
                                             }
@@ -330,7 +341,7 @@ def test_refs_1(oas):
                     "parameters": [
                         {
                             "in": "query",
-                            "name": "bar",
+                            "name": "a",
                             "schema": {
                                 "$ref": "#/components/schemas/bar",
                             },
