@@ -13,13 +13,23 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
+        with:
+          python-version: |
+            3.8
+            3.9
+            3.10
+            3.11
+            3.12
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: pip install tox coverage
 
       - name: Run tests
-        run: pytest --cov --cov-report=xml
+        run: tox
+
+      - name: Generate coverage report
+        run: coverage xml
 
       - name: Upload results to Codecov
         uses: codecov/codecov-action@v4
