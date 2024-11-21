@@ -363,3 +363,31 @@ def test_refs_1(oas):
             },
         },
     }
+
+
+def test_repr(oas):
+    obj = oas.RequestBodyObject(
+        {
+            "content": {
+                "application/json": {
+                    "schema": oas.SchemaObject(
+                        {
+                            "type": "array",
+                            "items": oas.SchemaObject({"type": "string"}),
+                        }
+                    )
+                }
+            }
+        }
+    )
+    assert obj == {
+        "content": {
+            "application/json": {
+                "schema": {"type": "array", "items": {"type": "string"}}
+            }
+        }
+    }
+    assert (
+        repr(obj)
+        == "{'content': {'application/json': {'schema': {'type': 'array', 'items': {'type': 'string'}}}}}"
+    )

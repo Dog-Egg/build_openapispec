@@ -59,6 +59,9 @@ class Schema(Mapping):
     def __hash__(self) -> int:
         return hash(self.__hash)
 
+    def __repr__(self) -> str:
+        return repr(self.__fields)
+
 
 class Root:
     pass
@@ -241,6 +244,7 @@ def openapispec(version: str, /):
         TagObject=TagObject,
         SecuritySchemeObject=SecuritySchemeObject,
         SecurityRequirementObject=SecurityRequirementObject,
+        RequestBodyObject=RequestBodyObject,
     )
 
 
