@@ -1,9 +1,15 @@
+from __future__ import annotations
+
 import typing as t
+import warnings
 from collections import UserDict, defaultdict
 from collections.abc import Mapping
 from functools import partial
 from inspect import cleandoc
 from types import SimpleNamespace
+
+from openapi_spec_validator import validate as validate_spec
+from openapi_spec_validator.validation.exceptions import OpenAPIValidationError
 
 
 class Empty:
@@ -192,13 +198,14 @@ class Components(UserDict):
         values[key] = value
 
 
-def build(version, openapi, /):
+def build(
+    version, openapi, /, *, validate: t.Literal["error", "warning", False] = "warning"
+):
     assert isinstance(openapi, Root)
 
     # schema count
     ref_count = count_references(openapi)
 
-    tags = {}
     components = Components()
 
     def dumps(data):
@@ -226,6 +233,20 @@ def build(version, openapi, /):
     rv["openapi"] = version
     if components:
         rv["components"] = dict(components)
+
+    if validate:
+        try:
+            validate_spec(rv)
+        except OpenAPIValidationError as e:
+            if validate == "warning":
+                warnings.warn(str(e), stacklevel=2)
+            elif validate == "error":
+                raise
+            else:
+                raise ValueError(
+                    "Invalid validation mode: %r" % validate
+                )  # pragma: no cover
+
     return rv
 
 
