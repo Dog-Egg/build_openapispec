@@ -243,7 +243,9 @@ def build(
             elif validate == "error":
                 raise
             else:
-                raise ValueError("Invalid validation mode: %r" % validate)
+                raise ValueError(
+                    "Invalid validation mode: %r" % validate
+                )  # pragma: no cover
 
     return rv
 
