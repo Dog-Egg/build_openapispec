@@ -1,3 +1,5 @@
+import re
+
 import pytest
 
 from build_openapispec import openapispec
@@ -5,23 +7,7 @@ from build_openapispec import openapispec
 
 @pytest.fixture
 def oas():
-
     oas = openapispec("3.0.3")
-    old_build = oas.build
-
-    def new_build(*args, **kwargs):
-        import json
-
-        from openapi_spec_validator import validate
-
-        result = old_build(*args, **kwargs)
-
-        validate(result)  # check valid schema
-        json.dumps(result)  # check json serializable
-
-        return result
-
-    oas.build = new_build
     return oas
 
 
@@ -391,3 +377,17 @@ def test_repr(oas):
         repr(obj)
         == "{'content': {'application/json': {'schema': {'type': 'array', 'items': {'type': 'string'}}}}}"
     )
+
+
+class TestValidation:
+    def test_warnings(self, oas):
+        with pytest.warns(
+            UserWarning, match=re.escape("'info' is a required property")
+        ):
+            oas.build(oas.OpenAPIObject())
+
+    def test_error(self, oas):
+        from openapi_spec_validator.validation.exceptions import OpenAPIValidationError
+
+        with pytest.raises(OpenAPIValidationError):
+            oas.build(oas.OpenAPIObject(), validate="error")

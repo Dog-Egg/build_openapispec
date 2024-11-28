@@ -100,5 +100,3 @@ assert oas.build(
     },
 }
 ```
-
-项目不提供结构、数据正确验证，可使用 [openapi-spec-validator](https://github.com/python-openapi/openapi-spec-validator) 进行验证。
